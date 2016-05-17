@@ -57,10 +57,18 @@
     extend: 'Rally.app.App',
     componentCls: 'app',
 
-    launch: function() {
+    layout: 'fit',
 
+    config: {
+        defaultSettings: {
+            types: 'defect',
+            query: '(State < Closed)'
+        }
+    },
+
+    launch: function() {
         Rally.data.wsapi.ModelFactory.getModels({
-            types: this._getTypeSetting()
+            types: this._getTypesSetting()
         }).then({
             success: this._onModelsLoaded,
             scope: this
@@ -70,13 +78,45 @@
     _onModelsLoaded: function(models) {
         this.models = _.values(models);
         var context = this.getContext(),
-            modelNames = this._getTypesSetting(),
+            modelNames = _.pluck(this.models, 'typePath'),
             gridBoardConfig = {
                 xtype: 'rallygridboard',
                 stateful: false,
                 toggleState: 'chart',
                 chartConfig: this._getChartConfig(),
-                plugins: [],
+                plugins: [{
+                    ptype:'rallygridboardinlinefiltercontrol',
+                    showInChartMode: true,
+                    inlineFilterButtonConfig: {
+                        stateful: true,
+                        stateId: context.getScopedStateId('filters'),
+                        filterChildren: true,
+                        modelNames: modelNames,
+                        inlineFilterPanelConfig: {
+                            quickFilterPanelConfig: {
+                                defaultFields: []
+                            }
+                        }
+                    }
+                },
+                {
+                    ptype: 'rallygridboardactionsmenu',
+                    menuItems: [{
+                        text: 'Export to CSV...',
+                        handler: function() {
+                            window.location = Rally.ui.gridboard.Export.buildCsvExportUrl(this.down('rallygridboard').getGridOrBoard());
+                        },
+                        scope: this
+                    }],
+                    buttonConfig: {
+                        iconCls: 'icon-export',
+                        toolTipConfig: {
+                            html: 'Export',
+                            anchor: 'top',
+                            hideDelay: 0
+                        }
+                    }
+                }],
                 context: context,
                 modelNames: modelNames,
                 storeConfig: {
@@ -88,49 +128,45 @@
     },
 
     _getTypesSetting: function() {
-        return ['defect'];
+        return this.getSetting('types').split(',');
     },
 
     _getCalculatorConfig: function() {
-      return {
-          calculatorType: 'PieCalculator',
-          calculatorConfig: {
-              calculationType: 'points',
-              field: 'State'
-          }
+        return {
+            calculatorType: 'PieCalculator',
+            calculatorConfig: {
+                calculationType: 'count',
+                field: 'Priority'
+            }
+        };
+    },
+
+    _getHighChartsConfig: function() {
+        return {
+            chartConfig: {
+                chart: { type: 'pie' },
+                title: {text: ''},
+                plotOptions: {
+                    pie: {}
+                }
+            }
         };
     },
 
     _getChartConfig: function() {
         return Ext.apply({
             xtype: 'rallychart',
+            chartColors: ['red', 'blue', 'green', 'yellow'],
             storeType: 'Rally.data.wsapi.artifact.Store',
             storeConfig: {
                 models: this._getTypesSetting(),
                 context: this.getContext().getDataContext(),
                 limit: Infinity,
-                fetch: ['PlanEstimate']
-            },
-            chartConfig: {
-                chart: { type: 'pie' },
-                title: {
-                    text: Ext.String.format('{0} - {1}',
-                        this.getContext().getProject().Name,
-                        _.map(this.types, function(type) {
-                            return Rally.util.TypeInfo.getTypeInfoByName(type).typeName;
-                        }).join(', '))
-                },
-                plotOptions: {
-                    pie: {
-                        minSize: 500,
-                        dataLabels: {
-                            distance: -30,
-                            color: 'white'
-                        }
-                    }
-                }
+                fetch: ['PlanEstimate', 'Priority']
             }
-        }, this._getCalculatorConfig());
+        },
+        this._getCalculatorConfig(),
+        this._getHighChartsConfig());
     },
 
     onTimeboxScopeChange: function(timeboxScope) {

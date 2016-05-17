@@ -7,7 +7,7 @@ Ext.define('CustomChartApp', {
     config: {
         defaultSettings: {
             types: 'defect',
-            query: '(State = Closed)'
+            query: '(State < Closed)'
         }
     },
 
@@ -101,6 +101,7 @@ Ext.define('CustomChartApp', {
     _getChartConfig: function() {
         return Ext.apply({
             xtype: 'rallychart',
+            chartColors: ['red', 'blue', 'green', 'yellow'],
             storeType: 'Rally.data.wsapi.artifact.Store',
             storeConfig: {
                 models: this._getTypesSetting(),
