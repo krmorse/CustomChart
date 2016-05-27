@@ -7,7 +7,7 @@ Ext.define('CustomChartApp', {
     config: {
         defaultSettings: {
             types: 'defect',
-            chartType: 'piechart',
+            chartType: 'barchart',
             aggregationField: 'State',
             aggregationType: 'count'
         }
