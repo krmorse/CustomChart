@@ -3,7 +3,7 @@
 <head>
     <title>Custom Chart</title>
 
-    <script type="text/javascript" src="/apps/x/sdk.js"></script>
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
 
     <script type="text/javascript">
         Rally.onReady(function () {
@@ -53,6 +53,23 @@
     }
 });
 
+                Ext.define('PieChart', {
+    xtype: 'piechart',
+    extend: 'Rally.ui.chart.Chart',
+    requires: [
+        'PieCalculator'
+    ],
+
+    chartConfig: {
+        chart: { type: 'pie' },
+        title: {text: ''},
+        plotOptions: {
+            pie: {}
+        }
+    },
+    calculatorType: 'PieCalculator'
+});
+
                 Ext.define('CustomChartApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
@@ -62,7 +79,9 @@
     config: {
         defaultSettings: {
             types: 'defect',
-            query: '(State < Closed)'
+            chartType: 'piechart',
+            aggregationField: 'State',
+            aggregationType: 'count'
         }
     },
 
@@ -94,7 +113,11 @@
                         modelNames: modelNames,
                         inlineFilterPanelConfig: {
                             quickFilterPanelConfig: {
-                                defaultFields: []
+                                defaultFields: [
+                                    'ScheduleState',
+                                    'Owner',
+                                    'ModelType'
+                                ]
                             }
                         }
                     }
@@ -131,42 +154,22 @@
         return this.getSetting('types').split(',');
     },
 
-    _getCalculatorConfig: function() {
-        return {
-            calculatorType: 'PieCalculator',
-            calculatorConfig: {
-                calculationType: 'count',
-                field: 'Priority'
-            }
-        };
-    },
-
-    _getHighChartsConfig: function() {
-        return {
-            chartConfig: {
-                chart: { type: 'pie' },
-                title: {text: ''},
-                plotOptions: {
-                    pie: {}
-                }
-            }
-        };
-    },
-
     _getChartConfig: function() {
-        return Ext.apply({
-            xtype: 'rallychart',
+        return {
+            xtype: this.getSetting('chartType'),
             chartColors: ['red', 'blue', 'green', 'yellow'],
             storeType: 'Rally.data.wsapi.artifact.Store',
             storeConfig: {
                 models: this._getTypesSetting(),
                 context: this.getContext().getDataContext(),
                 limit: Infinity,
-                fetch: ['PlanEstimate', 'Priority']
+                fetch: ['FormattedID', 'Name', 'PlanEstimate', 'Priority', 'State']
+            },
+            calculatorConfig: {
+                calculationType: this.getSetting('aggregationType'),
+                field: this.getSetting('aggregationField')
             }
-        },
-        this._getCalculatorConfig(),
-        this._getHighChartsConfig());
+        };
     },
 
     onTimeboxScopeChange: function(timeboxScope) {

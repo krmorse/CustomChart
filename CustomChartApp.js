@@ -7,7 +7,9 @@ Ext.define('CustomChartApp', {
     config: {
         defaultSettings: {
             types: 'defect',
-            query: '(State < Closed)'
+            chartType: 'piechart',
+            aggregationField: 'State',
+            aggregationType: 'count'
         }
     },
 
@@ -39,7 +41,11 @@ Ext.define('CustomChartApp', {
                         modelNames: modelNames,
                         inlineFilterPanelConfig: {
                             quickFilterPanelConfig: {
-                                defaultFields: []
+                                defaultFields: [
+                                    'ScheduleState',
+                                    'Owner',
+                                    'ModelType'
+                                ]
                             }
                         }
                     }
@@ -76,42 +82,22 @@ Ext.define('CustomChartApp', {
         return this.getSetting('types').split(',');
     },
 
-    _getCalculatorConfig: function() {
-        return {
-            calculatorType: 'PieCalculator',
-            calculatorConfig: {
-                calculationType: 'count',
-                field: 'Priority'
-            }
-        };
-    },
-
-    _getHighChartsConfig: function() {
-        return {
-            chartConfig: {
-                chart: { type: 'pie' },
-                title: {text: ''},
-                plotOptions: {
-                    pie: {}
-                }
-            }
-        };
-    },
-
     _getChartConfig: function() {
-        return Ext.apply({
-            xtype: 'rallychart',
+        return {
+            xtype: this.getSetting('chartType'),
             chartColors: ['red', 'blue', 'green', 'yellow'],
             storeType: 'Rally.data.wsapi.artifact.Store',
             storeConfig: {
                 models: this._getTypesSetting(),
                 context: this.getContext().getDataContext(),
                 limit: Infinity,
-                fetch: ['PlanEstimate', 'Priority']
+                fetch: ['FormattedID', 'Name', 'PlanEstimate', 'Priority', 'State']
+            },
+            calculatorConfig: {
+                calculationType: this.getSetting('aggregationType'),
+                field: this.getSetting('aggregationField')
             }
-        },
-        this._getCalculatorConfig(),
-        this._getHighChartsConfig());
+        };
     },
 
     onTimeboxScopeChange: function(timeboxScope) {
