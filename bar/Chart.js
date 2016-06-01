@@ -33,7 +33,8 @@ Ext.define('BarChart', {
                 dataLabels: {
                     enabled: false
                 },
-                showInLegend: false
+                showInLegend: false,
+                colorByPoint: true
             }
         }
     },
