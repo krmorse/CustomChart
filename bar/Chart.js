@@ -32,7 +32,8 @@ Ext.define('BarChart', {
                 stacking: 'normal',
                 dataLabels: {
                     enabled: false
-                }
+                },
+                showInLegend: false
             }
         }
     },
