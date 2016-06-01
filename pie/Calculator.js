@@ -36,6 +36,7 @@ Ext.define('PieCalculator', {
             categories: categories,
             series: [
                 {
+                    name: this.field,
                     type: 'pie',
                     data: seriesData
                 }

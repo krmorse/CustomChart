@@ -36,6 +36,7 @@ Ext.define('BarCalculator', {
             categories: categories,
             series: [
                {
+                   name: this.field,
                    type: 'column',
                    data: seriesData
                }

@@ -45,6 +45,7 @@
             categories: categories,
             series: [
                {
+                   name: this.field,
                    type: 'column',
                    data: seriesData
                }
@@ -65,6 +66,10 @@
         title: {
             text: ''
         },
+        tooltip: {
+            headerFormat: '',
+            pointFormat: '{point.name}: <b>{point.y}</b>'
+        },
         yAxis: {
             min: 0,
             title: {
@@ -82,11 +87,7 @@
             column: {
                 stacking: 'normal',
                 dataLabels: {
-                    enabled: true,
-                    color: 'white', //(Highcharts.theme && Highcharts.theme.dataLabelsColor)
-                    style: {
-                        textShadow: '0 0 3px black'
-                    }
+                    enabled: false
                 }
             }
         }
@@ -132,6 +133,7 @@
             categories: categories,
             series: [
                 {
+                    name: this.field,
                     type: 'pie',
                     data: seriesData
                 }
@@ -148,10 +150,29 @@
     ],
 
     chartConfig: {
-        chart: { type: 'pie' },
+        chart: {
+            type: 'pie',
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false
+        },
         title: {text: ''},
+        tooltip: {
+            headerFormat: '',
+            pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+        },
         plotOptions: {
-            pie: {}
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                        color: 'black'
+                    }
+                }
+            }
         }
     },
     calculatorType: 'PieCalculator'

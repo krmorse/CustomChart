@@ -10,6 +10,10 @@ Ext.define('BarChart', {
         title: {
             text: ''
         },
+        tooltip: {
+            headerFormat: '',
+            pointFormat: '{point.name}: <b>{point.y}</b>'
+        },
         yAxis: {
             min: 0,
             title: {
@@ -27,11 +31,7 @@ Ext.define('BarChart', {
             column: {
                 stacking: 'normal',
                 dataLabels: {
-                    enabled: true,
-                    color: 'white', //(Highcharts.theme && Highcharts.theme.dataLabelsColor)
-                    style: {
-                        textShadow: '0 0 3px black'
-                    }
+                    enabled: false
                 }
             }
         }
