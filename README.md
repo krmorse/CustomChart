@@ -8,7 +8,7 @@ This app is the chart equivalent of the Custom Board and Custom List apps.  Pick
 The app is installed as a Custom HTML App ([see help documentation](https://help.rallydev.com/custom-html))
 Once the app is installed, use the gear menu on the app panel and select "Edit App Settings". There are 5 settings you can configure.
 
-<img src="images/CustomChartSettings.png" height="413" width="410" alt="Custom Chart Settings Screenshot" />
+![custom chart settings screenshot](images/CustomChartSettings.png "Custom Chart Settings Screenshot")
 
 #### Chart Type
 Pick the type of chart you'd like to create.  Currently pie and bar are supported.
