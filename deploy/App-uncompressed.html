@@ -7,7 +7,8 @@
 
     <script type="text/javascript">
         Rally.onReady(function () {
-                Ext.define('BarCalculator', {
+                Ext.define('Calculator', {
+
     config: {
         calculationType: undefined,
         field: undefined
@@ -18,40 +19,42 @@
     },
 
     prepareChartData: function(store) {
-        var categories, seriesData, data;
+        var data = _.groupBy(store.getRange(), function(record) {
+            var value = record.get(this.field);
+            return _.isObject(value) ? value._refObjectName : value;
+        }, this),
+        categories = _.keys(data),
+        seriesData;
+
         if(this.calculationType === 'count') {
-            data = _.countBy(store.getRange(), function(record) {
-                return record.get(this.field);
-            }, this);
-            categories = _.keys(data);
-            seriesData = [];
-            _.each(data, function(value, key) {
-                seriesData.push([key, value]);
+            seriesData = _.map(data, function(value, key) {
+              return [key, value.length];
             });
         } else {
-            data = _.groupBy(store.getRange(), function(record) {
-                return record.get(this.field);
-            }, this);
-            categories = _.keys(data);
-            seriesData = [];
-            _.each(data, function(value, key) {
-                seriesData.push([key, _.reduce(value, function(total, r) {
+            seriesData = _.map(data, function(value, key) {
+                var planEstimateTotal = _.reduce(value, function(total, r) {
                     return total + r.get('PlanEstimate');
-                }, 0)]);
+                }, 0);
+                return [key, planEstimateTotal];
             });
         }
 
         return {
             categories: categories,
             series: [
-               {
-                   name: this.field,
-                   type: 'column',
-                   data: seriesData
-               }
+                {
+                    name: this.field,
+                    type: this.seriesType,
+                    data: seriesData
+                }
             ]
         };
     }
+});
+
+                Ext.define('BarCalculator', {
+    extend: 'Calculator',
+    seriesType: 'column'
 });
 
                 Ext.define('BarChart', {
@@ -98,50 +101,8 @@
 });
 
                 Ext.define('PieCalculator', {
-    config: {
-        calculationType: undefined,
-        field: undefined
-    },
-
-    constructor: function(config) {
-        this.initConfig(config);
-    },
-
-    prepareChartData: function(store) {
-        var categories, seriesData, data;
-        if(this.calculationType === 'count') {
-            data = _.countBy(store.getRange(), function(record) {
-                return record.get(this.field);
-            }, this);
-            categories = _.keys(data);
-            seriesData = [];
-            _.each(data, function(value, key) {
-                seriesData.push([key, value]);
-            });
-        } else {
-            data = _.groupBy(store.getRange(), function(record) {
-                return record.get(this.field);
-            }, this);
-            categories = _.keys(data);
-            seriesData = [];
-            _.each(data, function(value, key) {
-                seriesData.push([key, _.reduce(value, function(total, r) {
-                    return total + r.get('PlanEstimate');
-                }, 0)]);
-            });
-        }
-
-        return {
-            categories: categories,
-            series: [
-                {
-                    name: this.field,
-                    type: 'pie',
-                    data: seriesData
-                }
-            ]
-        };
-    }
+    extend: 'Calculator',
+    seriesType: 'pie'
 });
 
                 Ext.define('PieChart', {
@@ -190,7 +151,7 @@
         defaultSettings: {
             types: 'defect',
             chartType: 'piechart',
-            aggregationField: 'ScheduleState',
+            aggregationField: 'Iteration',
             aggregationType: 'count',
             query: ''
         }

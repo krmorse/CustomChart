@@ -8,7 +8,7 @@ Ext.define('CustomChartApp', {
         defaultSettings: {
             types: 'defect',
             chartType: 'piechart',
-            aggregationField: 'ScheduleState',
+            aggregationField: 'Iteration',
             aggregationType: 'count',
             query: ''
         }
