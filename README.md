@@ -1,13 +1,5 @@
-Custom Chart
-=========================
+# Custom Chart
 
-## Overview
+This app is the chart equivalent of the Custom Board and Custom Chart apps.  Pick a chart type (pie or bar), an artifact type, and a field to be aggregated and gain insight into your process.  Use the advanced filtering control to further slice and dice your data.  The data is also exportable for more fine grained inspection.
 
-
-## License
-
-Custom Chart is released under the MIT license.  See the file [LICENSE](./LICENSE) for the full text.
-
-##Documentation for SDK
-
-You can find the documentation on our help [site.](https://help.rallydev.com/apps/2.0/doc/)
+![custom chart screenshot](images/CustomChart.png "Custom Chart Screenshot")
