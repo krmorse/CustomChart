@@ -52,6 +52,7 @@ Ext.define('CustomChartApp', {
                 plugins: ['rallyfieldvalidationui'],
                 allowBlank: false,
                 autoSelect: false,
+                fieldLabel: 'Type', //todo: delete when multiselect enabled
                 // multiSelect: true, //todo: need to validate either all artifacts chosen or only one non-artifact
                 shouldRespondToScopeChange: true,
                 context: this.getContext(),
