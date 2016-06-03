@@ -16,10 +16,10 @@ Pick the type of chart you'd like to create.  Currently pie and bar are supporte
 #### Type
 Pick the type of data to include in the chart- Defect for example.
 
-### Aggregation Field
+#### Aggregation Field
 Pick the attribute on the previously selected type which will be used for generating the summary data for the chart.
 
-### Aggregation Type
+#### Aggregation Type
 Pick how the summary should be performed- via a simple count or by summing the plan estimates.
 
 #### Query
