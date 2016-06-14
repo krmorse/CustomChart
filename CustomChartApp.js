@@ -51,7 +51,10 @@ Ext.define('CustomChartApp', {
                 xtype: 'rallycombobox',
                 plugins: ['rallyfieldvalidationui'],
                 allowBlank: false,
+                editable: false,
                 autoSelect: false,
+                validateOnChange: false,
+                validateOnBlur: false,
                 fieldLabel: 'Type', //todo: delete when multiselect enabled
                 // multiSelect: true, //todo: need to validate either all artifacts chosen or only one non-artifact
                 shouldRespondToScopeChange: true,
@@ -72,6 +75,9 @@ Ext.define('CustomChartApp', {
                 listeners: {
                     change: function (combo) {
                         combo.fireEvent('typeselected', combo.getValue(), combo.context);
+                    },
+                    ready: function (combo) {
+                      combo.fireEvent('typeselected', combo.getValue(), combo.context);
                     }
                 },
                 bubbleEvents: ['typeselected'],
@@ -89,6 +95,8 @@ Ext.define('CustomChartApp', {
                 fieldLabel: 'Aggregate By',
                 readyEvent: 'ready',
                 allowBlank: false,
+                validateOnChange: false,
+                validateOnBlur: false,
                 handlesEvents: {
                     typeselected: function (models, context) {
                         var type = Ext.Array.from(models)[0];
@@ -111,6 +119,7 @@ Ext.define('CustomChartApp', {
                         var fields = Ext.Array.map(combo.store.getRange(), function (record) {
                             return record.get(combo.getValueField());
                         });
+
                         if (!Ext.Array.contains(fields, combo.getValue())) {
                             combo.setValue(fields[0]);
                         }
