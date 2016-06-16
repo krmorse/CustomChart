@@ -8,7 +8,7 @@ Ext.define('CustomChartApp', {
         defaultSettings: {
             types: 'defect',
             chartType: 'piechart',
-            aggregationField: 'Iteration',
+            aggregationField: 'State',
             aggregationType: 'count',
             query: ''
         }
@@ -165,11 +165,7 @@ Ext.define('CustomChartApp', {
                         modelNames: modelNames,
                         inlineFilterPanelConfig: {
                             quickFilterPanelConfig: {
-                                defaultFields: [
-                                    'ScheduleState',
-                                    'Owner',
-                                    'ModelType'
-                                ]
+                                defaultFields: this._getQuickFilters()
                             }
                         }
                     }
@@ -200,6 +196,26 @@ Ext.define('CustomChartApp', {
             };
 
         this.add(gridBoardConfig);
+    },
+
+    _getQuickFilters: function() {
+        var quickFilters = [],
+          types = this._getTypesSetting(),
+          type = types[0];
+        if (types.length > 1) {
+            quickFilters.push('ModelType');
+        }
+
+        if (Rally.data.ModelTypes.isArtifact(type)) {
+            quickFilters.push('Owner');
+            if (Rally.data.ModelTypes.isPortfolioItem(type)) {
+                quickFilters.push('State');
+            } else {
+                quickFilters.push('ScheduleState');
+            }
+        }
+
+        return quickFilters;
     },
 
     _getTypesSetting: function() {
