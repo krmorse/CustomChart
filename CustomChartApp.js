@@ -244,7 +244,8 @@ Ext.define('CustomChartApp', {
                 //TODO: can we do summary fetch here and not limit infinity?
                 //we'll have to also make sure the fetch is correct for export somehow...
                 limit: Infinity,
-                fetch: ['FormattedID', 'Name', 'PlanEstimate', this.getSetting('aggregationField')]
+                fetch: this._getChartFetch(),
+                sorters: this._getChartSort()
             },
             calculatorConfig: {
                 calculationType: this.getSetting('aggregationType'),
@@ -256,6 +257,19 @@ Ext.define('CustomChartApp', {
     onTimeboxScopeChange: function(timeboxScope) {
         this.callParent(arguments);
         this._addBoard();
+    },
+
+    _getChartFetch: function() {
+        var field = this.getSetting('aggregationField'),
+            fetch = ['FormattedID', 'Name', 'PlanEstimate', field];
+        return fetch;
+    },
+
+    _getChartSort: function() {
+        return [{
+            property: this.getSetting('aggregationField'),
+            direction: 'ASC'
+        }];
     },
 
     _getFilters: function() {
