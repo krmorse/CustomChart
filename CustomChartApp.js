@@ -139,7 +139,8 @@ Ext.define('CustomChartApp', {
                     fields: ['name', 'value'],
                     data: [
                         { name: 'Count', value: 'count' },
-                        { name: 'Plan Estimate', value: 'estimate' }
+                        { name: 'Plan Estimate', value: 'estimate' },
+                        { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' }
                     ]
                 })
             },
@@ -261,7 +262,7 @@ Ext.define('CustomChartApp', {
 
     _getChartFetch: function() {
         var field = this.getSetting('aggregationField'),
-            fetch = ['FormattedID', 'Name', 'PlanEstimate', field];
+            fetch = ['FormattedID', 'Name', 'PlanEstimate', 'LeafStoryPlanEstimateTotal', field];
         return fetch;
     },
 
