@@ -28,6 +28,7 @@ Ext.define('CustomChartApp', {
     },
 
     getSettingsFields: function() {
+        var me = this;
         return [
             {
                 name: 'chartType',
@@ -139,9 +140,27 @@ Ext.define('CustomChartApp', {
                     fields: ['name', 'value'],
                     data: [
                         { name: 'Count', value: 'count' },
-                        { name: 'Plan Estimate', value: 'estimate' }
+                        { name: 'Plan Estimate', value: 'estimate' },
+                        { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
+                        { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
-                })
+                }),
+                handlesEvents: {
+                    typeselected: function (types, context) {
+                        var type = Ext.Array.from(types)[0];
+                        Rally.data.ModelFactory.getModel({
+                            type: type,
+                            success: function(model) {
+                                this.store.filterBy(function(record) {
+                                    return record.get('value') === 'count' ||
+                                        model.hasField(me._getFieldForAggregationType(record.get('value')));
+                                });        
+                            },
+                            scope: this
+                        });
+
+                    }
+                },
             },
             { type: 'query' }
         ];
@@ -261,8 +280,23 @@ Ext.define('CustomChartApp', {
 
     _getChartFetch: function() {
         var field = this.getSetting('aggregationField'),
-            fetch = ['FormattedID', 'Name', 'PlanEstimate', field];
+            aggregationType = this.getSetting('aggregationType'),
+            fetch = ['FormattedID', 'Name', field];
+
+        if (aggregationType !== 'count') {
+            fetch.push(this._getFieldForAggregationType(aggregationType));
+        }
         return fetch;
+    },
+
+    _getFieldForAggregationType: function(aggregationType) {
+        if (aggregationType === 'estimate') {
+            return 'PlanEstimate';
+        } else if (aggregationType === 'prelimest') {
+            return 'PreliminaryEstimateValue';
+        } else if (aggregationType === 'leafplanest') {
+            return 'LeafStoryPlanEstimateTotal';
+        }
     },
 
     _getChartSort: function() {

@@ -23,11 +23,12 @@ Ext.define('Calculator', {
             });
         } else {
             seriesData = _.map(data, function(value, key) {
-                var planEstimateTotal = _.reduce(value, function(total, r) {
-                    return total + r.get('PlanEstimate');
-                }, 0);
-                return [key, planEstimateTotal];
-            });
+                var valueTotal = _.reduce(value, function(total, r) {
+                    var valueField = this._getValueFieldForCalculationType();
+                    return total + r.get(valueField);
+                }, 0, this);
+                return [key, valueTotal];
+            }, this);
         }
 
         return {
@@ -40,5 +41,16 @@ Ext.define('Calculator', {
                 }
             ]
         };
+    },
+
+    _getValueFieldForCalculationType: function() {
+        switch(this.calculationType) {
+            case 'leafplanest':
+                return 'LeafStoryPlanEstimateTotal';
+            case 'prelimest':
+                return 'PreliminaryEstimateValue';
+            default:
+                return 'PlanEstimate';
+        }
     }
 });
