@@ -27,7 +27,10 @@ Ext.define('Calculator', {
                 var planEstimateTotal = _.reduce(value, function(total, r) {
                   if(that.calculationType === 'leafplanest') {
                       return total + r.get('LeafStoryPlanEstimateTotal');
-                    }else {
+                    }else
+                    if(that.calculationType === 'prelimest') {
+                        return total + r.get('PreliminaryEstimateValue');
+                      }else {
                       return total + r.get('PlanEstimate');
                     }
                 }, 0);

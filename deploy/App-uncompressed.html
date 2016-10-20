@@ -36,7 +36,10 @@
                 var planEstimateTotal = _.reduce(value, function(total, r) {
                   if(that.calculationType === 'leafplanest') {
                       return total + r.get('LeafStoryPlanEstimateTotal');
-                    }else {
+                    }else
+                    if(that.calculationType === 'prelimest') {
+                        return total + r.get('PreliminaryEstimateValue');
+                      }else {
                       return total + r.get('PlanEstimate');
                     }
                 }, 0);
@@ -288,7 +291,8 @@
                     data: [
                         { name: 'Count', value: 'count' },
                         { name: 'Plan Estimate', value: 'estimate' },
-                        { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' }
+                        { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
+                        { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
                 })
             },
@@ -410,7 +414,8 @@
 
     _getChartFetch: function() {
         var field = this.getSetting('aggregationField'),
-            fetch = ['FormattedID', 'Name', 'PlanEstimate', 'LeafStoryPlanEstimateTotal', field];
+            fetch = ['FormattedID', 'Name', 'PlanEstimate', 'LeafStoryPlanEstimateTotal',
+              'PreliminaryEstimateValue', field];
         return fetch;
     },
 
