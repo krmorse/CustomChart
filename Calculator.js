@@ -10,7 +10,6 @@ Ext.define('Calculator', {
     },
 
     prepareChartData: function(store) {
-      var that = this;
         var data = _.groupBy(store.getRange(), function(record) {
             var value = record.get(this.field);
             return _.isObject(value) ? value._refObjectName : value;
@@ -24,18 +23,12 @@ Ext.define('Calculator', {
             });
         } else {
             seriesData = _.map(data, function(value, key) {
-                var planEstimateTotal = _.reduce(value, function(total, r) {
-                  if(that.calculationType === 'leafplanest') {
-                      return total + r.get('LeafStoryPlanEstimateTotal');
-                    }else
-                    if(that.calculationType === 'prelimest') {
-                        return total + r.get('PreliminaryEstimateValue');
-                      }else {
-                      return total + r.get('PlanEstimate');
-                    }
-                }, 0);
-                return [key, planEstimateTotal];
-            });
+                var valueTotal = _.reduce(value, function(total, r) {
+                    var valueField = this._getValueFieldForCalculationType();
+                    return total + r.get(valueField);
+                }, 0, this);
+                return [key, valueTotal];
+            }, this);
         }
 
         return {
@@ -48,5 +41,16 @@ Ext.define('Calculator', {
                 }
             ]
         };
+    },
+
+    _getValueFieldForCalculationType: function() {
+        switch(this.calculationType) {
+            case 'leafplanest':
+                return 'LeafStoryPlanEstimateTotal';
+            case 'prelimest':
+                return 'PreliminaryEstimateValue';
+            default:
+                return 'PlanEstimate';
+        }
     }
 });

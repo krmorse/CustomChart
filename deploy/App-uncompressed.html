@@ -19,7 +19,6 @@
     },
 
     prepareChartData: function(store) {
-      var that = this;
         var data = _.groupBy(store.getRange(), function(record) {
             var value = record.get(this.field);
             return _.isObject(value) ? value._refObjectName : value;
@@ -33,18 +32,12 @@
             });
         } else {
             seriesData = _.map(data, function(value, key) {
-                var planEstimateTotal = _.reduce(value, function(total, r) {
-                  if(that.calculationType === 'leafplanest') {
-                      return total + r.get('LeafStoryPlanEstimateTotal');
-                    }else
-                    if(that.calculationType === 'prelimest') {
-                        return total + r.get('PreliminaryEstimateValue');
-                      }else {
-                      return total + r.get('PlanEstimate');
-                    }
-                }, 0);
-                return [key, planEstimateTotal];
-            });
+                var valueTotal = _.reduce(value, function(total, r) {
+                    var valueField = this._getValueFieldForCalculationType();
+                    return total + r.get(valueField);
+                }, 0, this);
+                return [key, valueTotal];
+            }, this);
         }
 
         return {
@@ -57,6 +50,17 @@
                 }
             ]
         };
+    },
+
+    _getValueFieldForCalculationType: function() {
+        switch(this.calculationType) {
+            case 'leafplanest':
+                return 'LeafStoryPlanEstimateTotal';
+            case 'prelimest':
+                return 'PreliminaryEstimateValue';
+            default:
+                return 'PlanEstimate';
+        }
     }
 });
 
@@ -179,6 +183,7 @@
     },
 
     getSettingsFields: function() {
+        var me = this;
         return [
             {
                 name: 'chartType',
@@ -294,7 +299,23 @@
                         { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
                         { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
-                })
+                }),
+                handlesEvents: {
+                    typeselected: function (types, context) {
+                        var type = Ext.Array.from(types)[0];
+                        Rally.data.ModelFactory.getModel({
+                            type: type,
+                            success: function(model) {
+                                this.store.filterBy(function(record) {
+                                    return record.get('value') === 'count' ||
+                                        model.hasField(me._getFieldForAggregationType(record.get('value')));
+                                });        
+                            },
+                            scope: this
+                        });
+
+                    }
+                },
             },
             { type: 'query' }
         ];
@@ -414,9 +435,23 @@
 
     _getChartFetch: function() {
         var field = this.getSetting('aggregationField'),
-            fetch = ['FormattedID', 'Name', 'PlanEstimate', 'LeafStoryPlanEstimateTotal',
-              'PreliminaryEstimateValue', field];
+            aggregationType = this.getSetting('aggregationType'),
+            fetch = ['FormattedID', 'Name', field];
+
+        if (aggregationType !== 'count') {
+            fetch.push(this._getFieldForAggregationType(aggregationType));
+        }
         return fetch;
+    },
+
+    _getFieldForAggregationType: function(aggregationType) {
+        if (aggregationType === 'estimate') {
+            return 'PlanEstimate';
+        } else if (aggregationType === 'prelimest') {
+            return 'PreliminaryEstimateValue';
+        } else if (aggregationType === 'leafplanest') {
+            return 'LeafStoryPlanEstimateTotal';
+        }
     },
 
     _getChartSort: function() {
