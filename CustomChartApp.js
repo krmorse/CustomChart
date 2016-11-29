@@ -10,7 +10,8 @@ Ext.define('CustomChartApp', {
             chartType: 'piechart',
             aggregationField: 'State',
             aggregationType: 'count',
-            query: ''
+            query: '',
+            useNoneForBlank: false
         }
     },
 
@@ -162,6 +163,11 @@ Ext.define('CustomChartApp', {
                     }
                 },
             },
+            {
+                name: 'useNoneForBlank',
+                xtype:'rallycheckboxfield',
+                fieldLabel: 'Use "None" for ""'
+            },
             { type: 'query' }
         ];
     },
@@ -268,7 +274,8 @@ Ext.define('CustomChartApp', {
             },
             calculatorConfig: {
                 calculationType: this.getSetting('aggregationType'),
-                field: this.getSetting('aggregationField')
+                field: this.getSetting('aggregationField'),
+                useNoneForBlank: this.getSetting('useNoneForBlank')
             }
         };
     },
