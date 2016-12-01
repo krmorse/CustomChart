@@ -11,8 +11,7 @@ Ext.define('Calculator', {
 
     prepareChartData: function(store) {
         var data = _.groupBy(store.getRange(), function(record) {
-            var value = record.get(this.field);
-            return _.isObject(value) ? value._refObjectName : value;
+            return this._getDisplayValueForField(record, this.field);
         }, this),
         categories = _.keys(data),
         seriesData;
@@ -41,6 +40,25 @@ Ext.define('Calculator', {
                 }
             ]
         };
+    },
+
+    _getDisplayValueForField: function(record, fieldName) {
+        var value = record.get(fieldName);
+        if (_.isObject(value)) {
+            return value._refObjectName;
+        } else if (Ext.isEmpty(value)) {
+            var field = record.getField(fieldName),
+                fieldType = field.getType();
+            if (field.attributeDefinition.SchemaType === 'User') {
+                return '-- No Owner --';
+            } else if (fieldType === 'rating' || fieldType === 'object') {
+                return 'None';
+            } else {
+                return '-- No Entry --';
+            }
+        } else {
+            return value;
+        }
     },
 
     _getValueFieldForCalculationType: function() {
