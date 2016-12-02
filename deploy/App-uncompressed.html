@@ -20,8 +20,7 @@
 
     prepareChartData: function(store) {
         var data = _.groupBy(store.getRange(), function(record) {
-            var value = record.get(this.field);
-            return _.isObject(value) ? value._refObjectName : value;
+            return this._getDisplayValueForField(record, this.field);
         }, this),
         categories = _.keys(data),
         seriesData;
@@ -50,6 +49,25 @@
                 }
             ]
         };
+    },
+
+    _getDisplayValueForField: function(record, fieldName) {
+        var value = record.get(fieldName);
+        if (_.isObject(value)) {
+            return value._refObjectName;
+        } else if (Ext.isEmpty(value)) {
+            var field = record.getField(fieldName),
+                fieldType = field.getType();
+            if (fieldType === 'rating' || fieldType === 'object') {
+                return 'None';
+            } else if (field.attributeDefinition.SchemaType === 'user') {
+                return '-- No Owner --';
+            } else {
+                return '-- No Entry --';
+            }
+        } else {
+            return value;
+        }
     },
 
     _getValueFieldForCalculationType: function() {
@@ -301,7 +319,7 @@
                     ]
                 }),
                 handlesEvents: {
-                    typeselected: function (types, context) {
+                    typeselected: function (types) {
                         var type = Ext.Array.from(types)[0];
                         Rally.data.ModelFactory.getModel({
                             type: type,
@@ -309,7 +327,7 @@
                                 this.store.filterBy(function(record) {
                                     return record.get('value') === 'count' ||
                                         model.hasField(me._getFieldForAggregationType(record.get('value')));
-                                });        
+                                });
                             },
                             scope: this
                         });
@@ -428,7 +446,7 @@
         };
     },
 
-    onTimeboxScopeChange: function(timeboxScope) {
+    onTimeboxScopeChange: function() {
         this.callParent(arguments);
         this._addBoard();
     },

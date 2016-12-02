@@ -146,7 +146,7 @@ Ext.define('CustomChartApp', {
                     ]
                 }),
                 handlesEvents: {
-                    typeselected: function (types, context) {
+                    typeselected: function (types) {
                         var type = Ext.Array.from(types)[0];
                         Rally.data.ModelFactory.getModel({
                             type: type,
@@ -154,7 +154,7 @@ Ext.define('CustomChartApp', {
                                 this.store.filterBy(function(record) {
                                     return record.get('value') === 'count' ||
                                         model.hasField(me._getFieldForAggregationType(record.get('value')));
-                                });        
+                                });
                             },
                             scope: this
                         });
@@ -273,7 +273,7 @@ Ext.define('CustomChartApp', {
         };
     },
 
-    onTimeboxScopeChange: function(timeboxScope) {
+    onTimeboxScopeChange: function() {
         this.callParent(arguments);
         this._addBoard();
     },
