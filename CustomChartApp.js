@@ -139,8 +139,11 @@ Ext.define('CustomChartApp', {
                 store: Ext.create('Ext.data.Store', {
                     fields: ['name', 'value'],
                     data: [
+                        { name: 'Accepted Leaf Story Count', value: 'acceptedleafcount' },
+                        { name: 'Accepted Leaf Story Plan Estimate Total', value: 'acceptedleafplanest' },
                         { name: 'Count', value: 'count' },
-                        { name: 'Plan Estimate', value: 'estimate' },
+                        { name: 'Plan Estimate Total', value: 'estimate' },
+                        { name: 'Leaf Story Count', value: 'leafcount' },
                         { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
                         { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
@@ -290,12 +293,19 @@ Ext.define('CustomChartApp', {
     },
 
     _getFieldForAggregationType: function(aggregationType) {
-        if (aggregationType === 'estimate') {
-            return 'PlanEstimate';
-        } else if (aggregationType === 'prelimest') {
-            return 'PreliminaryEstimateValue';
-        } else if (aggregationType === 'leafplanest') {
-            return 'LeafStoryPlanEstimateTotal';
+        switch(aggregationType) {
+            case 'acceptedleafcount':
+                return 'AcceptedLeafStoryCount';
+            case 'acceptedleafplanest':
+                return 'AcceptedLeafStoryPlanEstimateTotal';
+            case 'leafcount':
+                return 'LeafStoryCount';
+            case 'leafplanest':
+                return 'LeafStoryPlanEstimateTotal';
+            case 'prelimest':
+                return 'PreliminaryEstimateValue';
+            default:
+                return 'PlanEstimate';
         }
     },
 

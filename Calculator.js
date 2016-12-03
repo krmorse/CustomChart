@@ -63,6 +63,12 @@ Ext.define('Calculator', {
 
     _getValueFieldForCalculationType: function() {
         switch(this.calculationType) {
+            case 'acceptedleafcount':
+                return 'AcceptedLeafStoryCount';
+            case 'acceptedleafplanest':
+                return 'AcceptedLeafStoryPlanEstimateTotal';
+            case 'leafcount':
+                return 'LeafStoryCount';
             case 'leafplanest':
                 return 'LeafStoryPlanEstimateTotal';
             case 'prelimest':
