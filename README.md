@@ -22,7 +22,7 @@ Pick the type of data to include in the chart- Defect for example.
 Pick the attribute on the previously selected type which will be used for generating the summary data for the chart.
 
 #### Aggregation Type
-Pick how the summary should be performed- via a simple count or by summing the plan estimates.
+Pick how the summary should be performed- via a simple count or by summing the plan estimates.  For charts based on Portfolio Items there are additional options based on all the rollup fields- AcceptedLeafStoryCount, LeafStoryPlanEstimateTotal, etc.
 
 #### Query
 In addition to the advanced filtering component in the app, you can write your own complex filter queries. [Extensive documentation] (https://help.rallydev.com/grid-queries?basehost=https://rally1.rallydev.com) is available. This might be useful if you want to always limit the chart to certain complex criteria.
