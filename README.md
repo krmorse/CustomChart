@@ -13,7 +13,7 @@ Once the app is installed, use the gear menu on the app panel and select "Edit A
 ![custom chart settings screenshot](images/CustomChartSettings.png "Custom Chart Settings Screenshot")
 
 #### Chart Type
-Pick the type of chart you'd like to create.  Currently pie and bar are supported.
+Pick the type of chart you'd like to create.  Bar, column, and pie charts are currently supported.
 
 #### Type
 Pick the type of data to include in the chart- Defect for example.
