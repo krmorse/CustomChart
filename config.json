@@ -7,6 +7,8 @@
         "Calculator.js",
         "bar/Calculator.js",
         "bar/Chart.js",
+        "column/Calculator.js",
+        "column/Chart.js",
         "pie/Calculator.js",
         "pie/Chart.js",
         "CustomChartApp.js"
