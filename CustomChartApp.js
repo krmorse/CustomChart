@@ -42,8 +42,9 @@ Ext.define('CustomChartApp', {
                 store: Ext.create('Ext.data.Store', {
                     fields: ['name', 'value'],
                     data: [
+                        { name: 'Bar', value: 'barchart' },
+                        { name: 'Column', value: 'columnchart'},
                         { name: 'Pie', value: 'piechart' },
-                        { name: 'Bar', value: 'barchart' }
                     ]
                 })
             },
@@ -98,6 +99,7 @@ Ext.define('CustomChartApp', {
                 allowBlank: false,
                 validateOnChange: false,
                 validateOnBlur: false,
+                width: 300,
                 handlesEvents: {
                     typeselected: function (models, context) {
                         var type = Ext.Array.from(models)[0];
@@ -136,15 +138,20 @@ Ext.define('CustomChartApp', {
                 valueField: 'value',
                 editable: false,
                 allowBlank: false,
-                store: Ext.create('Ext.data.Store', {
+                width: 300,
+                store: {
                     fields: ['name', 'value'],
                     data: [
+                        { name: 'Accepted Leaf Story Count', value: 'acceptedleafcount' },
+                        { name: 'Accepted Leaf Story Plan Estimate Total', value: 'acceptedleafplanest' },
                         { name: 'Count', value: 'count' },
-                        { name: 'Plan Estimate', value: 'estimate' },
+                        { name: 'Plan Estimate Total', value: 'estimate' },
+                        { name: 'Leaf Story Count', value: 'leafcount' },
                         { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
                         { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
-                }),
+                },
+                lastQuery: '',
                 handlesEvents: {
                     typeselected: function (types) {
                         var type = Ext.Array.from(types)[0];
@@ -155,6 +162,9 @@ Ext.define('CustomChartApp', {
                                     return record.get('value') === 'count' ||
                                         model.hasField(me._getFieldForAggregationType(record.get('value')));
                                 });
+                                if (!this.store.findRecord('value', this.getValue())) {
+                                    this.setValue('count');
+                                }
                             },
                             scope: this
                         });
@@ -290,12 +300,19 @@ Ext.define('CustomChartApp', {
     },
 
     _getFieldForAggregationType: function(aggregationType) {
-        if (aggregationType === 'estimate') {
-            return 'PlanEstimate';
-        } else if (aggregationType === 'prelimest') {
-            return 'PreliminaryEstimateValue';
-        } else if (aggregationType === 'leafplanest') {
-            return 'LeafStoryPlanEstimateTotal';
+        switch(aggregationType) {
+            case 'acceptedleafcount':
+                return 'AcceptedLeafStoryCount';
+            case 'acceptedleafplanest':
+                return 'AcceptedLeafStoryPlanEstimateTotal';
+            case 'leafcount':
+                return 'LeafStoryCount';
+            case 'leafplanest':
+                return 'LeafStoryPlanEstimateTotal';
+            case 'prelimest':
+                return 'PreliminaryEstimateValue';
+            default:
+                return 'PlanEstimate';
         }
     },
 
