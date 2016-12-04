@@ -90,7 +90,7 @@
 
                 Ext.define('BarCalculator', {
     extend: 'Calculator',
-    seriesType: 'column'
+    seriesType: 'bar'
 });
 
                 Ext.define('BarChart', {
@@ -98,6 +98,55 @@
     extend: 'Rally.ui.chart.Chart',
     requires: [
         'BarCalculator'
+    ],
+
+    chartConfig: {
+        chart: { type: 'bar' },
+        title: {
+            text: ''
+        },
+        tooltip: {
+            headerFormat: '',
+            pointFormat: '{point.name}: <b>{point.y}</b>'
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: ''//this.down('radiogroup').getValue().barCalculationType
+            },
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: 'gray'
+                }
+            }
+        },
+        legend: false,
+        plotOptions: {
+            bar: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: false
+                },
+                showInLegend: false,
+                colorByPoint: true
+            }
+        }
+    },
+    calculatorType: 'BarCalculator'
+});
+
+                Ext.define('ColumnCalculator', {
+    extend: 'Calculator',
+    seriesType: 'column'
+});
+
+                Ext.define('ColumnChart', {
+    xtype: 'columnchart',
+    extend: 'Rally.ui.chart.Chart',
+    requires: [
+        'ColumnCalculator'
     ],
 
     chartConfig: {
@@ -133,7 +182,7 @@
             }
         }
     },
-    calculatorType: 'BarCalculator'
+    calculatorType: 'ColumnCalculator'
 });
 
                 Ext.define('PieCalculator', {
@@ -221,8 +270,9 @@
                 store: Ext.create('Ext.data.Store', {
                     fields: ['name', 'value'],
                     data: [
+                        { name: 'Bar', value: 'barchart' },
+                        { name: 'Column', value: 'columnchart'},
                         { name: 'Pie', value: 'piechart' },
-                        { name: 'Bar', value: 'barchart' }
                     ]
                 })
             },
@@ -277,6 +327,7 @@
                 allowBlank: false,
                 validateOnChange: false,
                 validateOnBlur: false,
+                width: 300,
                 handlesEvents: {
                     typeselected: function (models, context) {
                         var type = Ext.Array.from(models)[0];
@@ -315,7 +366,8 @@
                 valueField: 'value',
                 editable: false,
                 allowBlank: false,
-                store: Ext.create('Ext.data.Store', {
+                width: 300,
+                store: {
                     fields: ['name', 'value'],
                     data: [
                         { name: 'Accepted Leaf Story Count', value: 'acceptedleafcount' },
@@ -326,7 +378,8 @@
                         { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
                         { name: 'Preliminary Estimate Value', value: 'prelimest' }
                     ]
-                }),
+                },
+                lastQuery: '',
                 handlesEvents: {
                     typeselected: function (types) {
                         var type = Ext.Array.from(types)[0];
@@ -337,6 +390,9 @@
                                     return record.get('value') === 'count' ||
                                         model.hasField(me._getFieldForAggregationType(record.get('value')));
                                 });
+                                if (!this.store.findRecord('value', this.getValue())) {
+                                    this.setValue('count');
+                                }
                             },
                             scope: this
                         });

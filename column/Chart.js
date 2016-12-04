@@ -1,12 +1,12 @@
-Ext.define('BarChart', {
-    xtype: 'barchart',
+Ext.define('ColumnChart', {
+    xtype: 'columnchart',
     extend: 'Rally.ui.chart.Chart',
     requires: [
-        'BarCalculator'
+        'ColumnCalculator'
     ],
 
     chartConfig: {
-        chart: { type: 'bar' },
+        chart: { type: 'column' },
         title: {
             text: ''
         },
@@ -27,9 +27,8 @@ Ext.define('BarChart', {
                 }
             }
         },
-        legend: false,
         plotOptions: {
-            bar: {
+            column: {
                 stacking: 'normal',
                 dataLabels: {
                     enabled: false
@@ -39,5 +38,5 @@ Ext.define('BarChart', {
             }
         }
     },
-    calculatorType: 'BarCalculator'
+    calculatorType: 'ColumnCalculator'
 });
