@@ -89,11 +89,18 @@ describe('CustomChartApp', function() {
             });
         });
 
-        pit('should order by the aggregation field', function() {
+        pit('should order by the aggregation field if non-collection', function() {
             return renderChart({ settings: { aggregationField: 'Priority' } }).then(function(chart) {
                 var sorters = app.down('rallygridboard').chartConfig.storeConfig.sorters;
                 expect(sorters.length).toBe(1);
                 expect(sorters[0]).toEqual({ property: 'Priority', direction: 'ASC' });
+            });
+        });
+
+        pit('should not include an order if aggregation field is a collection', function() {
+            return renderChart({ settings: { aggregationField: 'Tags' } }).then(function(chart) {
+                var sorters = app.down('rallygridboard').chartConfig.storeConfig.sorters;
+                expect(sorters.length).toBe(0);
             });
         });
 

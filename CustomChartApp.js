@@ -115,9 +115,10 @@ Ext.define('CustomChartApp', {
                     ready: function (combo) {
                         combo.store.filterBy(function (record) {
                             var field = record.get('fieldDefinition'),
-                                attr = field.attributeDefinition;
-                            return attr && !attr.Hidden && attr.AttributeType !== 'COLLECTION' &&
-                                !field.isMappedFromArtifact;
+                                attr = field.attributeDefinition,
+                                whiteList = ['Tags', 'Milestones'];
+                            return attr && !attr.Hidden && (((attr.AttributeType !== 'COLLECTION' || field.isMultiValueCustom()) &&
+                                !field.isMappedFromArtifact) || _.contains(whiteList, field.name));
                         });
                         var fields = Ext.Array.map(combo.store.getRange(), function (record) {
                             return record.get(combo.getValueField());
@@ -274,7 +275,8 @@ Ext.define('CustomChartApp', {
                 //we'll have to also make sure the fetch is correct for export somehow...
                 limit: Infinity,
                 fetch: this._getChartFetch(),
-                sorters: this._getChartSort()
+                sorters: this._getChartSort(),
+                pageSize: 2000,
             },
             calculatorConfig: {
                 calculationType: this.getSetting('aggregationType'),
@@ -317,10 +319,18 @@ Ext.define('CustomChartApp', {
     },
 
     _getChartSort: function() {
-        return [{
-            property: this.getSetting('aggregationField'),
-            direction: 'ASC'
-        }];
+        var model = this.models[0],
+            field = model.getField(this.getSetting('aggregationField'));
+
+        if (field && field.getType() !== 'collection') {
+            return [{
+                property: this.getSetting('aggregationField'),
+                direction: 'ASC'
+            }]; 
+        }
+
+        return [];
+        
     },
 
     _getFilters: function() {

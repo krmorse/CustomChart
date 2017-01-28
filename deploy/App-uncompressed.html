@@ -19,9 +19,7 @@
     },
 
     prepareChartData: function(store) {
-        var data = _.groupBy(store.getRange(), function(record) {
-            return this._getDisplayValueForField(record, this.field);
-        }, this),
+        var data = this._groupData(store),
         categories = _.keys(data),
         seriesData;
 
@@ -49,6 +47,30 @@
                 }
             ]
         };
+    },
+
+    _groupData: function(store) {
+        if (store.model.getField(this.field).getType() === 'collection') {
+            var groups = {};
+            _.each(store.getRange(), function(record) {
+                var value = record.get(this.field),
+                    values = value._tagsNameArray;
+                if (_.isEmpty(values)) {
+                    groups.None = groups.None || [];
+                    groups.None.push(record);
+                } else {
+                    _.each(values, function(val) {
+                        groups[val.Name] = groups[val.Name] || [];
+                        groups[val.Name].push(record);
+                    });
+                }
+            }, this);
+            return groups;
+        } else {
+            return _.groupBy(store.getRange(), function(record) {
+                return this._getDisplayValueForField(record, this.field);
+            }, this);
+        }
     },
 
     _getDisplayValueForField: function(record, fieldName) {
@@ -343,9 +365,10 @@
                     ready: function (combo) {
                         combo.store.filterBy(function (record) {
                             var field = record.get('fieldDefinition'),
-                                attr = field.attributeDefinition;
-                            return attr && !attr.Hidden && attr.AttributeType !== 'COLLECTION' &&
-                                !field.isMappedFromArtifact;
+                                attr = field.attributeDefinition,
+                                whiteList = ['Tags', 'Milestones'];
+                            return attr && !attr.Hidden && (((attr.AttributeType !== 'COLLECTION' || field.isMultiValueCustom()) &&
+                                !field.isMappedFromArtifact) || _.contains(whiteList, field.name));
                         });
                         var fields = Ext.Array.map(combo.store.getRange(), function (record) {
                             return record.get(combo.getValueField());
@@ -502,7 +525,8 @@
                 //we'll have to also make sure the fetch is correct for export somehow...
                 limit: Infinity,
                 fetch: this._getChartFetch(),
-                sorters: this._getChartSort()
+                sorters: this._getChartSort(),
+                pageSize: 2000,
             },
             calculatorConfig: {
                 calculationType: this.getSetting('aggregationType'),
@@ -545,10 +569,18 @@
     },
 
     _getChartSort: function() {
-        return [{
-            property: this.getSetting('aggregationField'),
-            direction: 'ASC'
-        }];
+        var model = this.models[0],
+            field = model.getField(this.getSetting('aggregationField'));
+
+        if (field && field.getType() !== 'collection') {
+            return [{
+                property: this.getSetting('aggregationField'),
+                direction: 'ASC'
+            }]; 
+        }
+
+        return [];
+        
     },
 
     _getFilters: function() {

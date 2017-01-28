@@ -17,10 +17,10 @@ describe('Calculator', function() {
             data = Rally.test.Mock.dataFactory.getRecords('defect', {
                 count: 4,
                 values: [
-                    { Priority: 'P1', PlanEstimate: 2, Owner: null, c_KanbanState: '' },
-                    { Priority: 'P2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, c_KanbanState: 'Building' },
-                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing' },
-                    { Priority: 'P4', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, c_KanbanState: 'Done' }
+                    { Priority: 'P1', PlanEstimate: 2, Owner: null, c_KanbanState: '', Tags: { _tagsNameArray: [] } },
+                    { Priority: 'P2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, c_KanbanState: 'Building', Tags: { _tagsNameArray: [{ Name: 'Foo' }, { Name: 'Bar' }] } },
+                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing', Tags: { _tagsNameArray: [{ Name: 'Bar' }, { Name: 'Baz' }] } },
+                    { Priority: 'P4', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, c_KanbanState: 'Done',  Tags: { _tagsNameArray: [{ Name: 'Baz' }] } }
                 ]
             });
             store = Ext.create('Rally.data.wsapi.Store', {
@@ -63,6 +63,18 @@ describe('Calculator', function() {
             });
             var chartData = calculator.prepareChartData(store);
             expect(chartData.categories).toEqual(['-- No Entry --', 'Building', 'Testing', 'Done']);
+        });
+
+        it('should aggregate by collection field', function() {
+            var calculator = Ext.create('Calculator', {
+                field: 'Tags',
+                calculationType: 'estimate'
+            });
+            var chartData = calculator.prepareChartData(store);
+            expect(chartData.categories).toEqual(['None', 'Foo', 'Bar', 'Baz']);
+            var seriesData = chartData.series[0];
+            expect(seriesData.name).toBe('Tags');
+            expect(seriesData.data).toEqual([['None', 2], ['Foo', 3], ['Bar', 7], ['Baz', 9]]);
         });
     });
 
