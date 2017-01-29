@@ -18,6 +18,8 @@ describe('CustomChartApp', function() {
         Rally.test.Mock.ajax.whenQuerying('Users').respondWith([]);
         Rally.test.Mock.ajax.whenQueryingAllowedValues('Defect', 'ScheduleState')
             .respondWith(["Defined", "In-Progress", "Completed", "Accepted"]);
+        Rally.test.Mock.ajax.whenQueryingAllowedValues('Defect', 'Priority')
+            .respondWith(["", "P1", "P2", "P3", "P4"]);
         var defects = Rally.test.Mock.dataFactory.getData('defect', { count: 10 });
         query = Rally.test.Mock.ajax.whenQuerying('artifact').respondWith(defects);
     });
@@ -26,6 +28,15 @@ describe('CustomChartApp', function() {
         pit('should render a pie chart', function() {
             return renderChart({ settings: { chartType: 'piechart' } }).then(function(chart) {
                 expect(chart.is('piechart')).toBe(true);
+            });
+        });
+
+        pit('should ignore stacking for a pie chart', function() {
+            return renderChart({ settings: { chartType: 'piechart', stackField: 'Priority' } }).then(function(chart) {
+                expect(chart.is('piechart')).toBe(true);
+                expect(chart.enableStacking).toBe(false);
+                expect(chart.calculator.stackField).not.toBeDefined();
+                expect(chart.calculator.stackValues).not.toBeDefined();
             });
         });
 
@@ -48,6 +59,24 @@ describe('CustomChartApp', function() {
             } }).then(function(chart) {
                 expect(chart.calculator.field).toBe('Priority');
                 expect(chart.calculator.calculationType).toBe('estimate');
+            });
+        });
+
+        describe('when stacking', function() {
+            pit('should configure stackField and values', function() {
+                return renderChart({ settings: { chartType: 'barchart', stackField: 'Priority' } }).then(function(chart) {
+                    expect(chart.enableStacking).toBe(true);
+                    expect(chart.calculator.stackField).toBe('Priority');
+                    expect(chart.calculator.stackValues).toEqual(["", "P1", "P2", "P3", "P4"]);
+                });
+            });
+
+            pit('should configure stackField without values', function() {
+                return renderChart({ settings: { chartType: 'barchart', stackField: 'Owner' } }).then(function(chart) {
+                    expect(chart.enableStacking).toBe(true);
+                    expect(chart.calculator.stackField).toBe('Owner');
+                    expect(chart.calculator.stackValues).not.toBeDefined();
+                });
             });
         });
     });
@@ -86,6 +115,12 @@ describe('CustomChartApp', function() {
         pit('should fetch the right fields', function() {
             return renderChart({ settings: { aggregationField: 'Priority' } }).then(function(chart) {
                 expect(app.down('rallygridboard').chartConfig.storeConfig.fetch).toEqual(['FormattedID', 'Name', 'Priority']);
+            });
+        });
+
+        pit('should fetch the stacking field', function() {
+            return renderChart({ settings: { chartType: 'barchart', aggregationField: 'Priority', stackField: 'Severity' } }).then(function(chart) {
+                expect(app.down('rallygridboard').chartConfig.storeConfig.fetch).toEqual(['FormattedID', 'Name', 'Priority', 'Severity']);
             });
         });
 
