@@ -10,9 +10,7 @@ Ext.define('Calculator', {
     },
 
     prepareChartData: function(store) {
-        var data = _.groupBy(store.getRange(), function(record) {
-            return this._getDisplayValueForField(record, this.field);
-        }, this),
+        var data = this._groupData(store),
         categories = _.keys(data),
         seriesData;
 
@@ -40,6 +38,30 @@ Ext.define('Calculator', {
                 }
             ]
         };
+    },
+
+    _groupData: function(store) {
+        if (store.model.getField(this.field).getType() === 'collection') {
+            var groups = {};
+            _.each(store.getRange(), function(record) {
+                var value = record.get(this.field),
+                    values = value._tagsNameArray;
+                if (_.isEmpty(values)) {
+                    groups.None = groups.None || [];
+                    groups.None.push(record);
+                } else {
+                    _.each(values, function(val) {
+                        groups[val.Name] = groups[val.Name] || [];
+                        groups[val.Name].push(record);
+                    });
+                }
+            }, this);
+            return groups;
+        } else {
+            return _.groupBy(store.getRange(), function(record) {
+                return this._getDisplayValueForField(record, this.field);
+            }, this);
+        }
     },
 
     _getDisplayValueForField: function(record, fieldName) {
