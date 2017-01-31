@@ -5,38 +5,52 @@ Ext.define('ColumnChart', {
         'ColumnCalculator'
     ],
 
-    chartConfig: {
-        chart: { type: 'column' },
-        title: {
-            text: ''
-        },
-        tooltip: {
-            headerFormat: '',
-            pointFormat: '{point.name}: <b>{point.y}</b>'
-        },
-        yAxis: {
-            min: 0,
+    config: {
+        chartConfig: {
+            chart: { type: 'column' },
             title: {
-                text: ''//this.down('radiogroup').getValue().barCalculationType
+                text: ''
             },
-            stackLabels: {
-                enabled: true,
-                style: {
-                    fontWeight: 'bold',
-                    color: 'gray'
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                stackLabels: {
+                    enabled: true,
+                    style: {
+                        fontWeight: 'bold',
+                        color: 'gray'
+                    }
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: false,
+                    colorByPoint: true
                 }
             }
         },
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
-                    enabled: false
-                },
-                showInLegend: false,
-                colorByPoint: true
-            }
-        }
+        calculatorType: 'ColumnCalculator'
     },
-    calculatorType: 'ColumnCalculator'
+
+    constructor: function(config) {
+        config = config || {};
+        this.mergeConfig(config);
+
+        this.chartConfig.plotOptions.column.showInLegend = this.enableStacking;
+        this.chartConfig.plotOptions.column.colorByPoint = !this.enableStacking;
+        
+        if (!this.enableStacking) {
+            this.chartConfig.tooltip = {
+                headerFormat: '',
+                pointFormat: '{point.name}: <b>{point.y}</b>'
+            };
+        }
+        this.callParent([this.config]);
+    }
 });

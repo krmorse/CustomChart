@@ -8,7 +8,7 @@ This app is the chart equivalent of the Custom Board and Custom List apps.  Pick
 
 ## Installation and Settings
 The app is installed as a Custom HTML App ([see help documentation](https://help.rallydev.com/custom-html))
-Once the app is installed, use the gear menu on the app panel and select "Edit App Settings". There are 5 settings you can configure.
+Once the app is installed, use the gear menu on the app panel and select "Edit App Settings". There are a few settings you can configure for each chart type.
 
 ![custom chart settings screenshot](images/CustomChartSettings.png "Custom Chart Settings Screenshot")
 
@@ -23,6 +23,9 @@ Pick the attribute on the previously selected type which will be used for genera
 
 #### Aggregation Type
 Pick how the summary should be performed- via a simple count or by summing the plan estimates.  For charts based on Portfolio Items there are additional options based on all the rollup fields- AcceptedLeafStoryCount, LeafStoryPlanEstimateTotal, etc.
+
+#### Stack By
+Available for bar and column charts.  Pick the attribute on the previously selected type which will be used to further break down the data within each bar or column.
 
 #### Query
 In addition to the advanced filtering component in the app, you can write your own complex filter queries. [Extensive documentation] (https://help.rallydev.com/grid-queries?basehost=https://rally1.rallydev.com) is available. This might be useful if you want to always limit the chart to certain complex criteria.

@@ -2,7 +2,9 @@ Ext.define('Calculator', {
 
     config: {
         calculationType: undefined,
-        field: undefined
+        field: undefined,
+        stackField: undefined,
+        stackValues: undefined
     },
 
     constructor: function(config) {
@@ -14,30 +16,74 @@ Ext.define('Calculator', {
         categories = _.keys(data),
         seriesData;
 
-        if(this.calculationType === 'count') {
-            seriesData = _.map(data, function(value, key) {
-              return [key, value.length];
-            });
+        if (!this.stackField) {
+            if(this.calculationType === 'count') {
+                seriesData = _.map(data, function(value, key) {
+                    return [key, value.length];
+                });
+            } else {
+                seriesData = _.map(data, function(value, key) {
+                    var valueTotal = _.reduce(value, function(total, r) {
+                        var valueField = this._getValueFieldForCalculationType();
+                        return total + r.get(valueField);
+                    }, 0, this);
+                    return [key, valueTotal];
+                }, this);
+            }
+          
+            return {
+                categories: categories,
+                series: [
+                    {
+                        name: this.field,
+                        type: this.seriesType,
+                        data: seriesData
+                    }
+                ]
+            };
         } else {
-            seriesData = _.map(data, function(value, key) {
-                var valueTotal = _.reduce(value, function(total, r) {
-                    var valueField = this._getValueFieldForCalculationType();
-                    return total + r.get(valueField);
-                }, 0, this);
-                return [key, valueTotal];
-            }, this);
-        }
+            var stackValues = _.unique(_.map(store.getRange(), function(record) {
+                return this._getDisplayValueForField(record, this.stackField);
+            }, this));
 
-        return {
-            categories: categories,
-            series: [
-                {
-                    name: this.field,
-                    type: this.seriesType,
-                    data: seriesData
-                }
-            ]
-        };
+            if (this.stackValues) {
+                stackValues = _.map(this.stackValues, function(stackValue) {
+                    return this._getDisplayValue(store.model.getField(this.stackField), stackValue);
+                }, this);
+            } 
+
+            var series = {};
+            _.each(categories, function(category) {
+                var group = data[category];
+                var recordsByStackValue = _.groupBy(group, function(record) {
+                    return this._getDisplayValueForField(record, this.stackField);
+                }, this);
+                _.each(stackValues, function(stackValue) {
+                    series[stackValue] = series[stackValue] || [];
+                    var records = recordsByStackValue[stackValue];
+                    if(this.calculationType === 'count') {
+                        series[stackValue].push((records && records.length) || 0);
+                    } else {
+                        var valueTotal = _.reduce(records, function(total, r) {
+                            var valueField = this._getValueFieldForCalculationType();
+                            return total + r.get(valueField);
+                        }, 0, this);
+                        series[stackValue].push(valueTotal);
+                    }
+                }, this);
+            }, this);
+          
+            return {
+                categories: categories,
+                series: _.map(stackValues, function(value) {
+                    return {
+                        name: value,
+                        type: this.seriesType,
+                        data: series[value]
+                    };
+                }, this)
+            };
+        }
     },
 
     _groupData: function(store) {
@@ -65,12 +111,17 @@ Ext.define('Calculator', {
     },
 
     _getDisplayValueForField: function(record, fieldName) {
-        var value = record.get(fieldName);
+        var field = record.getField(fieldName),
+            value = record.get(fieldName);
+        
+        return this._getDisplayValue(field, value);
+    },
+
+    _getDisplayValue: function(field, value) {
         if (_.isObject(value)) {
             return value._refObjectName;
         } else if (Ext.isEmpty(value)) {
-            var field = record.getField(fieldName),
-                fieldType = field.getType();
+            var fieldType = field.getType();
             if (field.attributeDefinition.SchemaType === 'User') {
                 return '-- No Owner --';
             } else if (fieldType === 'rating' || fieldType === 'object') {
@@ -84,19 +135,6 @@ Ext.define('Calculator', {
     },
 
     _getValueFieldForCalculationType: function() {
-        switch(this.calculationType) {
-            case 'acceptedleafcount':
-                return 'AcceptedLeafStoryCount';
-            case 'acceptedleafplanest':
-                return 'AcceptedLeafStoryPlanEstimateTotal';
-            case 'leafcount':
-                return 'LeafStoryCount';
-            case 'leafplanest':
-                return 'LeafStoryPlanEstimateTotal';
-            case 'prelimest':
-                return 'PreliminaryEstimateValue';
-            default:
-                return 'PlanEstimate';
-        }
+        return Utils.getFieldForAggregationType(this.calculationType);
     }
 });
