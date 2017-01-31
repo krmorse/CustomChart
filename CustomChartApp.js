@@ -168,7 +168,7 @@ Ext.define('CustomChartApp', {
             };
 
         if (model.isArtifact()) {
-            config.storeConfig.models = this._getTypesSetting(),
+            config.storeConfig.models = this._getTypesSetting();
             config.storeType = 'Rally.data.wsapi.artifact.Store';
         } else {
             config.storeConfig.model = model;
