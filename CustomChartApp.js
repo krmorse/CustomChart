@@ -133,41 +133,49 @@ Ext.define('CustomChartApp', {
     _getChartConfig: function() {
         var chartType = this.getSetting('chartType'),
             stackField = this._getStackingSetting(),
-            stackValues = this.stackValues;
+            stackValues = this.stackValues,
+            model = this.models[0],
+            config = {
+                xtype: chartType,
+                enableStacking: !!stackField,
+                chartColors: [
+                "#FF8200", // $orange
+                "#F6A900", // $gold
+                "#FAD200", // $yellow
+                "#8DC63F", // $lime
+                "#1E7C00", // $green_dk
+                "#337EC6", // $blue_link
+                "#005EB8", // $blue
+                "#7832A5", // $purple,
+                "#DA1884",  // $pink,
+                "#C0C0C0" // $grey4
+                ],
+                storeConfig: {
+                    context: this.getContext().getDataContext(),
+                    //TODO: can we do summary fetch here and not limit infinity?
+                    //we'll have to also make sure the fetch is correct for export somehow...
+                    limit: Infinity,
+                    fetch: this._getChartFetch(),
+                    sorters: this._getChartSort(),
+                    pageSize: 2000,
+                },
+                calculatorConfig: {
+                    calculationType: this.getSetting('aggregationType'),
+                    field: this.getSetting('aggregationField'),
+                    stackField: stackField,
+                    stackValues: stackValues
+                }
+            };
 
-        return {
-            xtype: chartType,
-            enableStacking: !!stackField,
-            storeType: 'Rally.data.wsapi.artifact.Store', //todo: only if artifact types selected
-            chartColors: [
-              "#FF8200", // $orange
-              "#F6A900", // $gold
-              "#FAD200", // $yellow
-              "#8DC63F", // $lime
-              "#1E7C00", // $green_dk
-              "#337EC6", // $blue_link
-              "#005EB8", // $blue
-              "#7832A5", // $purple,
-              "#DA1884",  // $pink,
-              "#C0C0C0" // $grey4
-            ],
-            storeConfig: {
-                models: this._getTypesSetting(),
-                context: this.getContext().getDataContext(),
-                //TODO: can we do summary fetch here and not limit infinity?
-                //we'll have to also make sure the fetch is correct for export somehow...
-                limit: Infinity,
-                fetch: this._getChartFetch(),
-                sorters: this._getChartSort(),
-                pageSize: 2000,
-            },
-            calculatorConfig: {
-                calculationType: this.getSetting('aggregationType'),
-                field: this.getSetting('aggregationField'),
-                stackField: stackField,
-                stackValues: stackValues
-            }
-        };
+        if (model.isArtifact()) {
+            config.storeConfig.models = this._getTypesSetting(),
+            config.storeType = 'Rally.data.wsapi.artifact.Store';
+        } else {
+            config.storeConfig.model = model;
+            config.storeType = 'Rally.data.wsapi.Store';
+        }
+
+        return config;
     },
 
     onTimeboxScopeChange: function() {

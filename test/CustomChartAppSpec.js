@@ -83,10 +83,19 @@ describe('CustomChartApp', function() {
 
     describe('data querying', function() {
 
-        pit('should query the right type', function() {
+        pit('should query the right type for an artifact', function() {
             return renderChart({ settings: { types: 'defect' } }).then(function(chart) {
                 expect(app.down('rallygridboard').modelNames).toEqual(['defect']);
                 expect(app.down('rallygridboard').chartConfig.storeConfig.models).toEqual(['defect']);
+                expect(app.down('rallygridboard').chartConfig.storeType).toEqual('Rally.data.wsapi.artifact.Store');
+            });
+        });
+
+        pit('should query the right type for a non artifact', function() {
+            return renderChart({ settings: { types: 'build' } }).then(function(chart) {
+                expect(app.down('rallygridboard').modelNames).toEqual(['build']);
+                expect(app.down('rallygridboard').chartConfig.storeConfig.model.typePath).toEqual('build');
+                expect(app.down('rallygridboard').chartConfig.storeType).toEqual('Rally.data.wsapi.Store');
             });
         });
 
