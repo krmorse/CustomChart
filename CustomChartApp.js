@@ -180,7 +180,12 @@ Ext.define('CustomChartApp', {
 
     onTimeboxScopeChange: function() {
         this.callParent(arguments);
-        this._addBoard();
+        
+        var gridBoard = this.down('rallygridboard');
+        if (gridBoard) {
+            gridBoard.destroy();
+        }
+        this._addChart();
     },
 
     _getChartFetch: function() {
