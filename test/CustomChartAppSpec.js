@@ -121,6 +121,27 @@ describe('CustomChartApp', function() {
             });
         });
 
+        pit('should refresh when the timebox changes', function() {
+            var iteration1 = Rally.test.Mock.dataFactory.getRecord('iteration'),
+                iteration2 = Rally.test.Mock.dataFactory.getRecord('iteration'),
+                timeboxScope1 = Ext.create('Rally.app.TimeboxScope', { record: iteration1 }),
+                timeboxScope2 = Ext.create('Rally.app.TimeboxScope', { record: iteration2 }),
+                appContext = Rally.test.Harness.getAppContext({
+                    timebox: timeboxScope1
+                });
+
+            return renderChart({ context: appContext}).then(function(chart) {
+                var destroySpy = Rally.test.Mock.spy(chart, 'destroy');
+                app.onTimeboxScopeChange(timeboxScope2);
+                expect(destroySpy).toHaveBeenCalled();
+                return once(function() { return app.down('rallychart') && app.down('rallychart').componentReady; }).then(function() {
+                    var filters = app.down('rallygridboard').storeConfig.filters;
+                    expect(filters.length).toBe(1);
+                    expect(filters[0].toString()).toBe(timeboxScope2.getQueryFilter().toString());
+                });
+            });
+        });
+
         pit('should fetch the right fields', function() {
             return renderChart({ settings: { aggregationField: 'Priority' } }).then(function(chart) {
                 expect(app.down('rallygridboard').chartConfig.storeConfig.fetch).toEqual(['FormattedID', 'Name', 'Priority']);
