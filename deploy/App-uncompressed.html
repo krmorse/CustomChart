@@ -612,6 +612,7 @@
 
     _addChart: function() {
         var context = this.getContext(),
+            whiteListFields = ['Milestones', 'Tags'],
             modelNames = _.pluck(this.models, 'typePath'),
             gridBoardConfig = {
                 xtype: 'rallygridboard',
@@ -627,8 +628,18 @@
                         modelNames: modelNames,
                         inlineFilterPanelConfig: {
                             quickFilterPanelConfig: {
-                                defaultFields: this._getQuickFilters()
-                            }
+                                defaultFields: this._getQuickFilters(),
+                                addQuickFilterConfig: {
+                                   whiteListFields: whiteListFields
+                                }
+                            },
+                            advancedFilterPanelConfig: {
+                               advancedFilterRowsConfig: {
+                                   propertyFieldConfig: {
+                                       whiteListFields: whiteListFields
+                                   }
+                               }
+                           }
                         }
                     }
                 },
@@ -739,11 +750,12 @@
 
     onTimeboxScopeChange: function() {
         this.callParent(arguments);
-        
+
         var gridBoard = this.down('rallygridboard');
         if (gridBoard) {
             gridBoard.destroy();
         }
+
         this._addChart();
     },
 
@@ -771,11 +783,10 @@
             sorters.push({
                 property: this.getSetting('aggregationField'),
                 direction: 'ASC'
-            }); 
+            });
         }
 
         return sorters;
-        
     },
 
     _getFilters: function() {

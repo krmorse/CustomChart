@@ -53,6 +53,7 @@ Ext.define('CustomChartApp', {
 
     _addChart: function() {
         var context = this.getContext(),
+            whiteListFields = ['Milestones', 'Tags'],
             modelNames = _.pluck(this.models, 'typePath'),
             gridBoardConfig = {
                 xtype: 'rallygridboard',
@@ -68,8 +69,18 @@ Ext.define('CustomChartApp', {
                         modelNames: modelNames,
                         inlineFilterPanelConfig: {
                             quickFilterPanelConfig: {
-                                defaultFields: this._getQuickFilters()
-                            }
+                                defaultFields: this._getQuickFilters(),
+                                addQuickFilterConfig: {
+                                   whiteListFields: whiteListFields
+                                }
+                            },
+                            advancedFilterPanelConfig: {
+                               advancedFilterRowsConfig: {
+                                   propertyFieldConfig: {
+                                       whiteListFields: whiteListFields
+                                   }
+                               }
+                           }
                         }
                     }
                 },
@@ -180,11 +191,12 @@ Ext.define('CustomChartApp', {
 
     onTimeboxScopeChange: function() {
         this.callParent(arguments);
-        
+
         var gridBoard = this.down('rallygridboard');
         if (gridBoard) {
             gridBoard.destroy();
         }
+
         this._addChart();
     },
 
@@ -212,11 +224,10 @@ Ext.define('CustomChartApp', {
             sorters.push({
                 property: this.getSetting('aggregationField'),
                 direction: 'ASC'
-            }); 
+            });
         }
 
         return sorters;
-        
     },
 
     _getFilters: function() {
