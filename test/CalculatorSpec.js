@@ -95,10 +95,10 @@ describe('Calculator', function() {
             data = Rally.test.Mock.dataFactory.getRecords('portfolioitem/feature', {
                 count: 4,
                 values: [
-                    { InvestmentCategory: 'UX', PreliminaryEstimateValue: 2, Parent: null, AcceptedLeafStoryCount: 3, AcceptedLeafStoryPlanEstimateTotal: 4, LeafStoryCount: 5, LeafStoryPlanEstimateTotal: 6 },
-                    { InvestmentCategory: 'Maintenance', PreliminaryEstimateValue: 3, Parent: { _refObjectName: 'Initiative1' }, AcceptedLeafStoryCount: 4, AcceptedLeafStoryPlanEstimateTotal: 5, LeafStoryCount: 6, LeafStoryPlanEstimateTotal: 7 },
-                    { InvestmentCategory: 'Product Roadmap', PreliminaryEstimateValue: 4, Parent: { _refObjectName: 'Initiative2' }, AcceptedLeafStoryCount: 5, AcceptedLeafStoryPlanEstimateTotal: 6, LeafStoryCount: 7, LeafStoryPlanEstimateTotal: 8 },
-                    { InvestmentCategory: 'Architecture Roadmap', PreliminaryEstimateValue: 5, Parent: { _refObjectName: 'Initiative3' }, AcceptedLeafStoryCount: 6, AcceptedLeafStoryPlanEstimateTotal: 7, LeafStoryCount: 8, LeafStoryPlanEstimateTotal: 9 }
+                    { InvestmentCategory: 'UX', PreliminaryEstimateValue: 2, Parent: null, AcceptedLeafStoryCount: 3, AcceptedLeafStoryPlanEstimateTotal: 4, LeafStoryCount: 5, LeafStoryPlanEstimateTotal: 6, RefinedEstimate: 7 },
+                    { InvestmentCategory: 'Maintenance', PreliminaryEstimateValue: 3, Parent: { _refObjectName: 'Initiative1' }, AcceptedLeafStoryCount: 4, AcceptedLeafStoryPlanEstimateTotal: 5, LeafStoryCount: 6, LeafStoryPlanEstimateTotal: 7, RefinedEstimate: 8 },
+                    { InvestmentCategory: 'Product Roadmap', PreliminaryEstimateValue: 4, Parent: { _refObjectName: 'Initiative2' }, AcceptedLeafStoryCount: 5, AcceptedLeafStoryPlanEstimateTotal: 6, LeafStoryCount: 7, LeafStoryPlanEstimateTotal: 8, RefinedEstimate: 9 },
+                    { InvestmentCategory: 'Architecture Roadmap', PreliminaryEstimateValue: 5, Parent: { _refObjectName: 'Initiative3' }, AcceptedLeafStoryCount: 6, AcceptedLeafStoryPlanEstimateTotal: 7, LeafStoryCount: 8, LeafStoryPlanEstimateTotal: 9, RefinedEstimate: 10 }
                 ]
             });
             store = Ext.create('Rally.data.wsapi.Store', {
@@ -116,7 +116,7 @@ describe('Calculator', function() {
             expectChartDataToBe(chartData, [['UX', 1], ['Maintenance', 1], ['Product Roadmap', 1], ['Architecture Roadmap', 1]]);
         });
 
-        it('should aggregate by preliminary estimate', function() {
+        it('should aggregate by preliminary estimate value total', function() {
           var calculator = Ext.create('Calculator', {
               field: 'InvestmentCategory',
               calculationType: 'prelimest'
@@ -159,6 +159,15 @@ describe('Calculator', function() {
           });
           var chartData = calculator.prepareChartData(store);
           expectChartDataToBe(chartData, [['UX', 6], ['Maintenance', 7], ['Product Roadmap', 8], ['Architecture Roadmap', 9]]);
+        });
+
+        it('should aggregate by refined estimate total', function() {
+          var calculator = Ext.create('Calculator', {
+              field: 'InvestmentCategory',
+              calculationType: 'refinedest'
+          });
+          var chartData = calculator.prepareChartData(store);
+          expectChartDataToBe(chartData, [['UX', 7], ['Maintenance', 8], ['Product Roadmap', 9], ['Architecture Roadmap', 10]]);
         });
 
         it('should bucket by object type', function() {
@@ -206,11 +215,11 @@ describe('Calculator', function() {
                 calculationType: 'count'
             });
             var chartData = calculator.prepareChartData(store);
-            expectChartDataToBe(chartData, [ 
-                { name: 'None', type: 'bar', data: [ 0, 0, 0, 2 ] }, 
-                { name: 'S1', type: 'bar', data: [ 1, 0, 0, 0 ] }, 
-                { name: 'S2', type: 'bar', data: [ 0, 1, 0, 0 ] }, 
-                { name: 'S3', type: 'bar', data: [ 0, 0, 1, 0 ] }, 
+            expectChartDataToBe(chartData, [
+                { name: 'None', type: 'bar', data: [ 0, 0, 0, 2 ] },
+                { name: 'S1', type: 'bar', data: [ 1, 0, 0, 0 ] },
+                { name: 'S2', type: 'bar', data: [ 0, 1, 0, 0 ] },
+                { name: 'S3', type: 'bar', data: [ 0, 0, 1, 0 ] },
                 { name: 'S4', type: 'bar', data: [ 0, 0, 0, 0 ] }
             ]);
         });
@@ -223,11 +232,11 @@ describe('Calculator', function() {
                 calculationType: 'estimate'
             });
             var chartData = calculator.prepareChartData(store);
-            expectChartDataToBe(chartData, [ 
-                { name: 'None', type: 'bar', data: [ 0, 0, 0, 11 ] }, 
-                { name: 'S1', type: 'bar', data: [ 2, 0, 0, 0 ] }, 
-                { name: 'S2', type: 'bar', data: [ 0, 3, 0, 0 ] }, 
-                { name: 'S3', type: 'bar', data: [ 0, 0, 4, 0 ] }, 
+            expectChartDataToBe(chartData, [
+                { name: 'None', type: 'bar', data: [ 0, 0, 0, 11 ] },
+                { name: 'S1', type: 'bar', data: [ 2, 0, 0, 0 ] },
+                { name: 'S2', type: 'bar', data: [ 0, 3, 0, 0 ] },
+                { name: 'S3', type: 'bar', data: [ 0, 0, 4, 0 ] },
                 { name: 'S4', type: 'bar', data: [ 0, 0, 0, 0 ] }
             ]);
         });
@@ -239,10 +248,10 @@ describe('Calculator', function() {
                 calculationType: 'count'
             });
             var chartData = calculator.prepareChartData(store);
-            expectChartDataToBe(chartData, [ 
-                { name: '-- No Owner --', type: 'column', data: [ 1, 0, 0, 0 ] }, 
-                { name: 'User1', type: 'column', data: [ 0, 1, 0, 0 ] }, 
-                { name: 'User2', type: 'column', data: [ 0, 0, 1, 0 ] }, 
+            expectChartDataToBe(chartData, [
+                { name: '-- No Owner --', type: 'column', data: [ 1, 0, 0, 0 ] },
+                { name: 'User1', type: 'column', data: [ 0, 1, 0, 0 ] },
+                { name: 'User2', type: 'column', data: [ 0, 0, 1, 0 ] },
                 { name: 'User3', type: 'column', data: [ 0, 0, 0, 2 ] }
             ]);
         });
@@ -254,10 +263,10 @@ describe('Calculator', function() {
                 calculationType: 'estimate'
             });
             var chartData = calculator.prepareChartData(store);
-            expectChartDataToBe(chartData, [ 
-                { name: '-- No Owner --', type: 'column', data: [ 2, 0, 0, 0 ] }, 
-                { name: 'User1', type: 'column', data: [ 0, 3, 0, 0 ] }, 
-                { name: 'User2', type: 'column', data: [ 0, 0, 4, 0 ] }, 
+            expectChartDataToBe(chartData, [
+                { name: '-- No Owner --', type: 'column', data: [ 2, 0, 0, 0 ] },
+                { name: 'User1', type: 'column', data: [ 0, 3, 0, 0 ] },
+                { name: 'User2', type: 'column', data: [ 0, 0, 4, 0 ] },
                 { name: 'User3', type: 'column', data: [ 0, 0, 0, 11 ] }
             ]);
         });

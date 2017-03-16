@@ -13,6 +13,8 @@ Ext.define('Utils', {
                 return 'LeafStoryPlanEstimateTotal';
             case 'prelimest':
                 return 'PreliminaryEstimateValue';
+            case 'refinedest':
+                return 'RefinedEstimate';
             default:
                 return 'PlanEstimate';
         }
