@@ -133,7 +133,8 @@ Ext.define('Settings', {
                         { name: 'Plan Estimate Total', value: 'estimate' },
                         { name: 'Leaf Story Count', value: 'leafcount' },
                         { name: 'Leaf Story Plan Estimate Total', value: 'leafplanest' },
-                        { name: 'Preliminary Estimate Value', value: 'prelimest' }
+                        { name: 'Preliminary Estimate Total', value: 'prelimest' },
+                        { name: 'Refined Estimate Total', value: 'refinedest' }
                     ]
                 },
                 lastQuery: '',
@@ -195,10 +196,10 @@ Ext.define('Settings', {
                             var field = record.get('fieldDefinition'),
                                 attr = field.attributeDefinition;
 
-                            return record.get(combo.getValueField()) === combo.noEntryValue || 
+                            return record.get(combo.getValueField()) === combo.noEntryValue ||
                                 (attr && !attr.Hidden && field.hasAllowedValues() && !_.contains(['collection'], field.getType()));
                         });
-                        
+
                         var fields = Ext.Array.map(combo.store.getRange(), function (record) {
                             return record.get(combo.getValueField());
                         });
