@@ -22,7 +22,8 @@ Ext.define('ColumnChart', {
                         fontWeight: 'bold',
                         color: 'gray'
                     }
-                }
+                },
+                reversedStacks: false
             },
             plotOptions: {
                 column: {

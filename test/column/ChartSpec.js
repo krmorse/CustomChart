@@ -20,6 +20,7 @@ describe('ColumnChart', function() {
             expect(chart.chartConfig.plotOptions.column.showInLegend).toBe(true);
             expect(chart.chartConfig.plotOptions.column.colorByPoint).toBe(false);
             expect(chart.chartConfig.tooltip).not.toBeDefined();
+            expect(chart.chartConfig.yAxis.reversedStacks).toBe(false);
         });
 
         it('should configure for no stacking', function() {

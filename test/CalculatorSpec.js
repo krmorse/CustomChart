@@ -251,11 +251,11 @@ describe('Calculator', function() {
             data = Rally.test.Mock.dataFactory.getRecords('defect', {
                 count: 5,
                 values: [
-                    { Priority: '', Severity: 'S1', PlanEstimate: 2, Owner: null },
-                    { Priority: 'P1', Severity: 'S2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' } },
-                    { Priority: 'P2', Severity: 'S3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' } },
-                    { Priority: 'P3', Severity: '', PlanEstimate: 5, Owner: { _refObjectName: 'User3' } },
-                    { Priority: 'P3', Severity: '', PlanEstimate: 6, Owner: { _refObjectName: 'User3' } }
+                    { Priority: '', Severity: 'S1', PlanEstimate: 2, Owner: null, Iteration: { _refObjectName: 'Iteration 1', StartDate: '2014-05-06' }, Release: { _refObjectName: 'Release 1', ReleaseStartDate: '2014-05-06' } },
+                    { Priority: 'P1', Severity: 'S2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, Iteration: { _refObjectName: 'Iteration 3', StartDate: '2016-02-03' }, Release: { _refObjectName: 'Release 3', ReleaseStartDate: '2016-02-03' } },
+                    { Priority: 'P2', Severity: 'S3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, Iteration: null, Release: null },
+                    { Priority: 'P3', Severity: '', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, Iteration: { _refObjectName: 'Iteration 2', StartDate: '2015-01-02' }, Release: { _refObjectName: 'Release 2', ReleaseStartDate: '2015-01-02' } },
+                    { Priority: 'P3', Severity: '', PlanEstimate: 6, Owner: { _refObjectName: 'User3' }, Iteration: { _refObjectName: 'Iteration 3', StartDate: '2016-02-03' }, Release: { _refObjectName: 'Release 3', ReleaseStartDate: '2016-02-03'} }
                 ]
             });
             store = Ext.create('Rally.data.wsapi.Store', {
@@ -325,6 +325,36 @@ describe('Calculator', function() {
                 { name: 'User1', type: 'column', data: [ 0, 3, 0, 0 ] },
                 { name: 'User2', type: 'column', data: [ 0, 0, 4, 0 ] },
                 { name: 'User3', type: 'column', data: [ 0, 0, 0, 11 ] }
+            ]);
+        });
+
+        it('should order stack values by Iteration.StartDate', function() {
+             var calculator = Ext.create('ColumnCalculator', {
+                field: 'Priority',
+                stackField: 'Iteration',
+                calculationType: 'estimate'
+            });
+            var chartData = calculator.prepareChartData(store);
+            expectChartDataToBe(chartData, [
+                { name: 'None', type: 'column', data: [ 0, 0, 4, 0 ] },
+                { name: 'Iteration 1', type: 'column', data: [ 2, 0, 0, 0 ] },
+                { name: 'Iteration 2', type: 'column', data: [ 0, 0, 0, 5 ] },
+                { name: 'Iteration 3', type: 'column', data: [ 0, 3, 0, 6 ] }
+            ]);
+        });
+
+        it('should order stack values by Release.ReleaseStartDate', function() {
+             var calculator = Ext.create('ColumnCalculator', {
+                field: 'Priority',
+                stackField: 'Release',
+                calculationType: 'estimate'
+            });
+            var chartData = calculator.prepareChartData(store);
+            expectChartDataToBe(chartData, [
+                { name: 'None', type: 'column', data: [ 0, 0, 4, 0 ] },
+                { name: 'Release 1', type: 'column', data: [ 2, 0, 0, 0 ] },
+                { name: 'Release 2', type: 'column', data: [ 0, 0, 0, 5 ] },
+                { name: 'Release 3', type: 'column', data: [ 0, 3, 0, 6 ] }
             ]);
         });
     });

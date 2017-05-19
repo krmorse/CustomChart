@@ -20,6 +20,7 @@ describe('BarChart', function() {
             expect(chart.chartConfig.plotOptions.bar.showInLegend).toBe(true);
             expect(chart.chartConfig.plotOptions.bar.colorByPoint).toBe(false);
             expect(chart.chartConfig.tooltip).not.toBeDefined();
+            expect(chart.chartConfig.yAxis.reversedStacks).toBe(false);
         });
 
         it('should configure for no stacking', function() {
