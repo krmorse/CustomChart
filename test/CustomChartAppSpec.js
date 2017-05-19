@@ -154,6 +154,18 @@ describe('CustomChartApp', function() {
             });
         });
 
+        pit('should fetch ReleaseStartDate when stacking by Release', function() {
+            return renderChart({ settings: { chartType: 'barchart', aggregationField: 'Priority', stackField: 'Release' } }).then(function(chart) {
+                expect(app.down('rallygridboard').chartConfig.storeConfig.fetch).toEqual(['FormattedID', 'Name', 'Priority', 'Release', 'ReleaseStartDate']);
+            });
+        });
+
+        pit('should fetch StartDate when stacking by Iteration', function() {
+            return renderChart({ settings: { chartType: 'barchart', aggregationField: 'Priority', stackField: 'Iteration' } }).then(function(chart) {
+                expect(app.down('rallygridboard').chartConfig.storeConfig.fetch).toEqual(['FormattedID', 'Name', 'Priority', 'Iteration', 'StartDate']);
+            });
+        });
+
         pit('should order by the aggregation field if non-collection', function() {
             return renderChart({ settings: { aggregationField: 'Priority' } }).then(function(chart) {
                 var sorters = app.down('rallygridboard').chartConfig.storeConfig.sorters;

@@ -42,15 +42,25 @@ Ext.define('Calculator', {
                 ]
             };
         } else {
-            var stackValues = _.unique(_.map(store.getRange(), function(record) {
-                return this._getDisplayValueForField(record, this.stackField);
-            }, this));
+            var stackField = store.model.getField(this.stackField),
+                stackValues;
 
             if (this.stackValues) {
                 stackValues = _.map(this.stackValues, function(stackValue) {
-                    return this._getDisplayValue(store.model.getField(this.stackField), stackValue);
+                    return this._getDisplayValue(stackField, stackValue);
                 }, this);
-            } 
+            } else {
+                var values = _.invoke(store.getRange(), 'get', this.stackField);
+                if (this.stackField === 'Iteration' || this.stackField === 'Release') {
+                    values = _.sortBy(values, function(timebox) {
+                        var dateValue = timebox && (timebox.StartDate || timebox.ReleaseStartDate || null);
+                        return new Date(dateValue);
+                    });
+                }
+                stackValues = _.unique(_.map(values, function(value) {
+                    return this._getDisplayValue(stackField, value);
+                }, this));
+            }
 
             var series = {};
             _.each(categories, function(category) {

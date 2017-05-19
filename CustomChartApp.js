@@ -38,7 +38,7 @@ Ext.define('CustomChartApp', {
             stackingSetting = this._getStackingSetting(),
             stackingField = stackingSetting && model.getField(stackingSetting);
 
-        if (stackingField && stackingField.hasAllowedValues() && _.contains(['rating', 'string'], stackingField.getType())) {
+        if (stackingField && stackingField.hasAllowedValues() && _.contains(['state', 'rating', 'string'], stackingField.getType())) {
             stackingField.getAllowedValueStore().load().then({
                 success: function(records) {
                     this.stackValues = _.invoke(records, 'get', 'StringValue');
@@ -212,6 +212,14 @@ Ext.define('CustomChartApp', {
         if (stackField) {
             fetch.push(stackField);
         }
+
+        if (_.contains(fetch, 'Iteration')) {
+            fetch.push('StartDate');
+        }
+        if (_.contains(fetch, 'Release')) {
+            fetch.push('ReleaseStartDate');
+        }
+
         return fetch;
     },
 

@@ -22,7 +22,8 @@ Ext.define('BarChart', {
                         fontWeight: 'bold',
                         color: 'gray'
                     }
-                }
+                },
+                reversedStacks: false
             },
             plotOptions: {
                 bar: {
