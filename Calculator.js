@@ -128,7 +128,9 @@ Ext.define('Calculator', {
     },
 
     _getDisplayValue: function(field, value) {
-        if (_.isObject(value)) {
+        if (_.isDate(value)) {
+            return Rally.util.DateTime.formatWithDefault(value);
+        } else if (_.isObject(value)) {
             return value._refObjectName;
         } else if (Ext.isEmpty(value)) {
             var fieldType = field.getType();

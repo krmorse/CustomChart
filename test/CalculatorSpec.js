@@ -74,10 +74,10 @@ describe('Calculator', function() {
             data = Rally.test.Mock.dataFactory.getRecords('defect', {
                 count: 4,
                 values: [
-                    { Priority: 'P1', PlanEstimate: 2, Owner: null, c_KanbanState: '', Tags: { _tagsNameArray: [] } },
-                    { Priority: 'P2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, c_KanbanState: 'Building', Tags: { _tagsNameArray: [{ Name: 'Foo' }, { Name: 'Bar' }] } },
-                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing', Tags: { _tagsNameArray: [{ Name: 'Bar' }, { Name: 'Baz' }] } },
-                    { Priority: 'P4', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, c_KanbanState: 'Done',  Tags: { _tagsNameArray: [{ Name: 'Baz' }] } }
+                    { Priority: 'P1', PlanEstimate: 2, Owner: null, c_KanbanState: '', Tags: { _tagsNameArray: [] }, ClosedDate: null },
+                    { Priority: 'P2', PlanEstimate: 3, Owner: { _refObjectName: 'User1' }, c_KanbanState: 'Building', Tags: { _tagsNameArray: [{ Name: 'Foo' }, { Name: 'Bar' }] }, ClosedDate: '2017-01-02T12:00:00Z' },
+                    { Priority: 'P3', PlanEstimate: 4, Owner: { _refObjectName: 'User2' }, c_KanbanState: 'Testing', Tags: { _tagsNameArray: [{ Name: 'Bar' }, { Name: 'Baz' }] }, ClosedDate: '2017-02-03T12:00:00Z' },
+                    { Priority: 'P4', PlanEstimate: 5, Owner: { _refObjectName: 'User3' }, c_KanbanState: 'Done',  Tags: { _tagsNameArray: [{ Name: 'Baz' }] }, ClosedDate: null }
                 ]
             });
             store = Ext.create('Rally.data.wsapi.Store', {
@@ -120,6 +120,15 @@ describe('Calculator', function() {
             });
             var chartData = calculator.prepareChartData(store);
             expect(chartData.categories).toEqual(['-- No Entry --', 'Building', 'Testing', 'Done']);
+        });
+
+        it('should bucket by date field type', function() {
+            var calculator = Ext.create('Calculator', {
+                field: 'ClosedDate',
+                calculationType: 'estimate'
+            });
+            var chartData = calculator.prepareChartData(store);
+            expect(chartData.categories).toEqual(['-- No Entry --', '2017-01-02', '2017-02-03']);
         });
 
         it('should aggregate by collection field', function() {
